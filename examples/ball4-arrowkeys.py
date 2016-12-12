@@ -28,7 +28,7 @@ def main():
     ball = Ball(250, 250)
 
     # initialize the pygame framework
-    pygame.init()
+    pygame.init() #pylint: disable=E1101
 
     # create screen
     screen = pygame.display.set_mode((width, height))
