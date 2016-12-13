@@ -244,14 +244,15 @@ def main():
     bkgrnd_img = \
     pygame.image.load('images/background.png').convert_alpha()
     # draw characters
+    goblins = []
+    goblins.append(Goblin(30, 30, 0, 2, 'images/goblin.png'))
     monster_1 = Monster(30, 30, 0, 3, 'images/monster.png')
-    goblin_1 = Monster(30, 30, 0, 2, 'images/goblin.png')
     hero_1 = Hero(256, 220, 'images/hero.png')
     # game loop
     stop_game = False
     game_won = False
     game_lost = False
-    level = 0
+    goblin_added = False
     while not stop_game:
         # ----EVENT HANDLING CODE----
         for event in pygame.event.get():
@@ -275,11 +276,13 @@ def main():
                     game_lost = False
                     win_tone_played = False
                     lose_tone_played = False
+                    goblin_added = False
                     background_music.play()
                     monster_1.pos_x = random.randint(0, width)
                     monster_1.pos_y = random.randint(0, height)
-                    goblin_1.pos_x = random.randint(0, width)
-                    goblin_1.pos_y = random.randint(0, height)
+                    for goblin in goblins:
+                        goblin.pos_x = random.randint(0, width)
+                        goblin.pos_y = random.randint(0, height)
             # If user closes window, quite game
             if event.type == pygame.QUIT: #pylint: disable=E1101
                 # if they closed the window, set stop_game to True
@@ -291,17 +294,24 @@ def main():
             game_won = True
             hero_1.spd_x, hero_1.spd_y = 0, 0
             monster_1.spd_x, monster_1.spd_y = 0, 0
-            goblin_1.spd_x, goblin_1.spd_y = 0, 0
-            level += 1
+            # add a goblin
+            if not goblin_added:
+                goblins.append(Goblin(30, 30, 0, 2, 'images/goblin.png'))
+                goblin_added = True
+            for goblin in goblins:
+                goblin.spd_x, goblin.spd_y = 0, 0
         # detect collision between hero and goblins
-        elif detect_collision(hero_1, goblin_1):
-            game_lost = True
-            level = 1
+        for goblin in goblins:
+            if detect_collision(hero_1, goblin):
+                game_lost = True
+                goblins = []
+                goblins.append(Goblin(30, 30, 0, 2, 'images/goblin.png'))
         # if no collisions, update positions as normal
-        else:
+        if not game_lost and not game_won:
             hero_1.update_pos(width, height)
             monster_1.update_pos(width, height)
-            goblin_1.update_pos(width, height)
+            for goblin in goblins:
+                goblin.update_pos(width, height)
         # ----CUSTOM DISPLAY CODE----
         # Always draw background first
         screen.blit(bkgrnd_img, (0, 0))
@@ -325,7 +335,8 @@ def main():
         # Draw monsters / goblins until game is won
         if not game_won:
             monster_1.render(screen)
-            goblin_1.render(screen)
+            for goblin in goblins:
+                goblin.render(screen)
         pygame.display.update()
         # tick the clock to enforce a max framerate
         clock.tick(60)
