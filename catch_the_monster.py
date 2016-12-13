@@ -19,11 +19,11 @@ class Hero(object):
     '''
     spd_x = 0
     spd_y = 0
-    img = pygame.image.load('images/hero.png').convert_alpha()
-    def __init__(self, pos_x, pos_y):
+
+    def __init__(self, pos_x, pos_y, img):
         self.pos_x = pos_x
         self.pos_y = pos_y
-
+        self.img = pygame.image.load(img).convert_alpha()
     def update_pos(self):
         '''
         Updates direction of hero character
@@ -66,11 +66,11 @@ class Monster(object):
         '''
         Initialize a monster with position, speed, and an image
         '''
+        self.img = pygame.image.load(img).convert_alpha()
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.spd_x = spd_x
         self.spd_y = spd_y
-        self.img = pygame.image.load(img).convert_alpha()
 
     def update_pos(self, width, height, timer):
         '''
@@ -95,8 +95,6 @@ class Monster(object):
             if new_direction == 4:
                 self.spd_x = -1 * self.spd_x
                 self.spd_y = 0
-            print "Monster speed x: %s" % self.spd_x
-            print "Monster speed y: %s" % self.spd_y
             timer = time.time()
         if self.pos_x > width:
             self.pos_x = 0
@@ -138,7 +136,7 @@ def main():
     pygame.image.load('images/background.png').convert_alpha()
     monster_1 = Monster(30, 30, 0, 3, 'images/monster.png')
     goblin_1 = Monster(30, 30, 0, 2, 'images/goblin.png')
-    hero_1 = Hero(256, 220)
+    hero_1 = Hero(256, 220, 'images/hero.png')
     direction_timer = time.time()
     # game loop
     stop_game = False
@@ -156,7 +154,7 @@ def main():
             text = font.render('Hit Enter to play again', True, (0, 0, 0))
             # draw items onto screen
             # Play win tone...just once
-            if win_tone_played == 0 and win == True:
+            if win_tone_played == 0 and win:
                 # Stop background music, play lose music. Set lose counter to
                 # one so that music doesn't loop
                 background_music.stop()
@@ -165,7 +163,7 @@ def main():
                 # Draw background and hero image only
                 screen.blit(bkgrnd_img, (0, 0))
                 screen.blit(hero_1.img, (hero_1.pos_x, hero_1.pos_y))
-            elif lose_tone_played == 0 and win == False:
+            elif lose_tone_played == 0 and not win:
                 # Stop background music, play lose music. Set lose counter to
                 # one so that music doesn't loop
                 background_music.stop()
